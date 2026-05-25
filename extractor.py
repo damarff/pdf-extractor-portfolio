@@ -1,7 +1,7 @@
 import os
 import json
 import pdfplumber
-import google.generativeai as genai
+from google import genai
 from pydantic import BaseModel
 from typing import List
 from dotenv import load_dotenv
@@ -38,9 +38,7 @@ def parse_with_llm(raw_text: str) -> str:
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set in .env file.")
         
-    genai.configure(api_key=api_key)
-    # Using gemini-1.5-flash which is extremely fast and free
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    client = genai.Client(api_key=api_key)
     
     prompt = f"""
     You are an expert data extraction assistant. I will provide raw text extracted from a financial PDF (invoice).
@@ -51,9 +49,10 @@ def parse_with_llm(raw_text: str) -> str:
     {raw_text}
     """
     
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.GenerationConfig(
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt,
+        config=genai.types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=InvoiceData,
             temperature=0.0
