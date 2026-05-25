@@ -1,7 +1,7 @@
 import os
 import json
 import pdfplumber
-from openai import OpenAI
+import google.generativeai as genai
 from pydantic import BaseModel
 from typing import List
 from dotenv import load_dotenv
@@ -33,12 +33,14 @@ def extract_text_from_pdf(pdf_path: str) -> str:
     return text
 
 def parse_with_llm(raw_text: str) -> str:
-    """Uses LLM to parse messy raw text into structured JSON."""
-    api_key = os.getenv("OPENAI_API_KEY")
+    """Uses Google Gemini (Free Tier) to parse messy raw text into structured JSON."""
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set in .env file.")
+        raise ValueError("GEMINI_API_KEY is not set in .env file.")
         
-    client = OpenAI(api_key=api_key)
+    genai.configure(api_key=api_key)
+    # Using gemini-1.5-flash which is extremely fast and free
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     prompt = f"""
     You are an expert data extraction assistant. I will provide raw text extracted from a financial PDF (invoice).
@@ -49,17 +51,16 @@ def parse_with_llm(raw_text: str) -> str:
     {raw_text}
     """
     
-    response = client.beta.chat.completions.parse(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a precise financial data extraction bot."},
-            {"role": "user", "content": prompt}
-        ],
-        response_format=InvoiceData,
-        temperature=0.0
+    response = model.generate_content(
+        prompt,
+        generation_config=genai.GenerationConfig(
+            response_mime_type="application/json",
+            response_schema=InvoiceData,
+            temperature=0.0
+        ),
     )
     
-    return response.choices[0].message.parsed.model_dump_json(indent=2)
+    return response.text
 
 def process_document(pdf_path: str):
     print(f"[*] Processing {pdf_path}...")
