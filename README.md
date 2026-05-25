@@ -5,12 +5,12 @@ An intelligent pipeline that extracts unstructured text from messy financial PDF
 ## Business Value 💼
 Manual data entry is slow, error-prone, and expensive. Traditional OCR and regex-based solutions break whenever a vendor changes their invoice layout. 
 
-This solution uses **Generative AI (OpenAI's Structured Outputs)** to semantically understand the document regardless of its visual layout, ensuring **99%+ accuracy** for accounting, ERP, and CRM data entry automation.
+This solution uses **Generative AI (Google Gemini's Structured Outputs)** to semantically understand the document regardless of its visual layout, ensuring **99%+ accuracy** for accounting, ERP, and CRM data entry automation.
 
 ## Features 🚀
 - **Robust Text Extraction**: Uses `pdfplumber` to accurately scrape text and tabular data from PDFs.
-- **LLM Semantic Parsing**: Uses OpenAI's `gpt-4o-mini` (can be swapped for Claude/Llama) to map messy text into a strict Pydantic JSON schema.
-- **100% Reliable JSON**: Leverages OpenAI's Structured Outputs API to guarantee the output JSON schema matches your database exactly, eliminating hallucination errors.
+- **LLM Semantic Parsing**: Uses Google Gemini's `gemini-1.5-flash` (can be swapped for Claude/Llama) to map messy text into a strict Pydantic JSON schema.
+- **100% Reliable JSON**: Leverages Google Gemini's Structured Outputs API to guarantee the output JSON schema matches your database exactly, eliminating hallucination errors.
 
 ## Example Use Case
 **Input**: A messy, multi-page PDF invoice from a new supplier.
@@ -23,9 +23,9 @@ This solution uses **Generative AI (OpenAI's Structured Outputs)** to semantical
 pip install -r requirements.txt
 ```
 
-2. Set your OpenAI API Key in `.env`:
+2. Set your Google Gemini API Key in `.env`:
 ```env
-OPENAI_API_KEY=sk-your-key-here
+GEMINI_API_KEY=your-free-key-here
 ```
 
 3. Run the extractor on any PDF:
@@ -36,5 +36,5 @@ python extractor.py sample_invoice.pdf
 ## Tech Stack
 - **Python 3.10+**
 - **pdfplumber** (PDF parsing)
-- **OpenAI API** (Semantic extraction)
+- **Google Gemini API** (Semantic extraction)
 - **Pydantic** (Schema validation)
